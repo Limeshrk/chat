@@ -1,0 +1,7 @@
+build
+assets
+dist
+node_modules
+.DS_Store
+Thumbs.db
+db_config.js
