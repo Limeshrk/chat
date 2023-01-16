@@ -9,7 +9,8 @@ import {
   query,
   orderBy,
   getDocs,
-  onSnapshot
+  onSnapshot,
+  documentId
 } from 'firebase/firestore';
 import scrollIntoView from 'scroll-into-view-if-needed';
 
@@ -42,14 +43,14 @@ async function displayAllMessages() {
   const messages = await getDocs(q);
   document.querySelector('#messages').innerHTML = '';
   messages.forEach((doc) => {
-    displayMessage(doc.data());
+    displayMessage(doc.data(), doc.id);
   });
 }
 
-function displayMessage(message) {
+function displayMessage(message, id) {
   const messageHTML = /*html*/ `
-    <div class="message">
-      <i class="fas fa-user"></i>
+  <div class="message" data-id="${id}">
+       <i class="fas fa-user"></i>
       <div>
         <span class="username">${message.username}
         <time>${message.date}</time>
@@ -70,6 +71,20 @@ function displayMessage(message) {
     scrollMode: 'if-needed',
     block: 'end'
   });
+  document
+    .querySelector(`[data-id="${id}"] .fa-trash-alt`)
+    .addEventListener(
+      'click',
+      deleteMessage.bind(id),
+      console.log('listener added for: ', id)
+    );
+}
+
+async function deleteMessage() {
+  console.log('deleteclick');
+  const docRef = doc(db, 'messages', id);
+  await deleteDoc(docRef);
+  console.log('Document deleted with ID: ', docRef.id);
 }
 
 function handleSubmit() {
@@ -109,7 +124,7 @@ onSnapshot(q, (snapshot) => {
       console.log('Modified');
     }
     if (change.type === 'removed') {
-      console.log('Removed');
+      removeMessage(change.doc.data());
     }
   });
   initialLoad = false;
