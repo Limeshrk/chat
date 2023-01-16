@@ -12,7 +12,8 @@ import {
   getDocs,
   onSnapshot,
   documentId,
-  doc
+  doc,
+  updateDoc
 } from 'firebase/firestore';
 import scrollIntoView from 'scroll-into-view-if-needed';
 
@@ -77,8 +78,56 @@ function displayMessage(message, id) {
     .querySelector(`[data-id="${id}"] .fa-trash-alt`)
     .addEventListener('click', () => {
       deleteMessage(id);
-      console.log('listener added for: ', id);
+      console.log('remove listener added for: ', id);
     });
+  document.querySelector(`[data-id="${id}"] .fa-pen`).addEventListener('click', () => {
+    displayEditMessage(id);
+    console.log('edit listener added for: ', id);
+  });
+}
+
+function displayEditMessage(id) {
+  const editPopupHTML = /*html*/ `
+    <div class="popup-container" id="popup">
+      <div class="edit-message" id="edit-message" data-id="${id}">
+        <div id="close-popup" class="button">
+          Close <i class="fa fa-window-close" aria-hidden="true"></i>
+        </div>
+        <textarea id="edit" name="" cols="30" rows="10">${document
+          .querySelector(`.message[data-id="${id}"] .message-text`)
+          .textContent.trim()}</textarea>
+        <div id="save-message" class="button">
+          Save message<i class="fas fa-save"></i>
+        </div>
+      </div>
+    </div>
+`;
+  document.querySelector('#messages').insertAdjacentHTML('beforeend', editPopupHTML);
+  scrollIntoView(document.querySelector('#messages'), {
+    scrollMode: 'if-needed',
+    block: 'end'
+  });
+  document.querySelector(`#close-popup`).addEventListener('click', () => {
+    const element = document.getElementById('popup');
+    element.remove();
+  });
+  document.querySelector(`#save-message`).addEventListener('click', () => {
+    console.log('saving edit');
+    modifyMessage();
+    const element = document.getElementById('popup');
+    element.remove();
+  });
+}
+
+async function modifyMessage() {
+  const id = document.querySelector('#edit-message').dataset.id;
+  var newMessage = document.querySelector(`#edit`).value;
+  // console.log(id, newMessage);
+  document.querySelector(`.message[data-id="${id}"] .message-text`).textContent =
+    newMessage;
+  const docRef = doc(db, 'messages', id);
+  await updateDoc(docRef, { message: newMessage });
+  console.log('Document updated with ID: ', id, 'to: ', newMessage);
 }
 
 function removeMessage(id) {

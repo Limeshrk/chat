@@ -2,7 +2,7 @@
 
 Known bugs:
 
-- requires a refresh for new messages to get the "data-id"
+- requires a refresh for freshly added messages to get the "data-id" populated
 
 # Installing
 
