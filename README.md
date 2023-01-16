@@ -1,6 +1,8 @@
 # Chat app using firebase
 
-This app allows you to search for dogs by breed. It will give you a random image every time you hit search
+Known bugs:
+
+- requires a refresh for new messages to get the "data-id"
 
 # Installing
 

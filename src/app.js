@@ -5,12 +5,14 @@ import {
   getFirestore,
   collection,
   addDoc,
+  deleteDoc,
   Timestamp,
   query,
   orderBy,
   getDocs,
   onSnapshot,
-  documentId
+  documentId,
+  doc
 } from 'firebase/firestore';
 import scrollIntoView from 'scroll-into-view-if-needed';
 
@@ -73,18 +75,24 @@ function displayMessage(message, id) {
   });
   document
     .querySelector(`[data-id="${id}"] .fa-trash-alt`)
-    .addEventListener(
-      'click',
-      deleteMessage.bind(id),
-      console.log('listener added for: ', id)
-    );
+    .addEventListener('click', () => {
+      deleteMessage(id);
+      console.log('listener added for: ', id);
+    });
 }
 
-async function deleteMessage() {
-  console.log('deleteclick');
+function removeMessage(id) {
+  const input = document.querySelector(`.message[data-id="${id}"]`);
+  console.log('removeMessage: ', input);
+  input.remove();
+}
+
+async function deleteMessage(id) {
+  console.log('deleteclick', id);
   const docRef = doc(db, 'messages', id);
   await deleteDoc(docRef);
   console.log('Document deleted with ID: ', docRef.id);
+  removeMessage(id);
 }
 
 function handleSubmit() {
@@ -124,7 +132,7 @@ onSnapshot(q, (snapshot) => {
       console.log('Modified');
     }
     if (change.type === 'removed') {
-      removeMessage(change.doc.data());
+      console.log('Removed');
     }
   });
   initialLoad = false;
