@@ -1,9 +1,5 @@
 # Chat app using firebase
 
-Known bugs:
-
-- requires a refresh for freshly added messages to get the "data-id" populated
-
 # Installing
 
 To install the application, clone this repo

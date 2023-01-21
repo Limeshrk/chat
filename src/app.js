@@ -28,6 +28,7 @@ const db = getFirestore(app);
 async function sendMessage(message) {
   const docRef = await addDoc(collection(db, 'messages'), message);
   console.log('Document written with ID: ', docRef.id);
+  location.reload();
 }
 
 function createMessage() {
@@ -130,18 +131,18 @@ async function modifyMessage() {
   console.log('Document updated with ID: ', id, 'to: ', newMessage);
 }
 
-function removeMessage(id) {
-  const input = document.querySelector(`.message[data-id="${id}"]`);
-  console.log('removeMessage: ', input);
-  input.remove();
-}
-
 async function deleteMessage(id) {
   console.log('deleteclick', id);
   const docRef = doc(db, 'messages', id);
   await deleteDoc(docRef);
   console.log('Document deleted with ID: ', docRef.id);
   removeMessage(id);
+}
+function removeMessage(id) {
+  console.log('removeMessageID:', id);
+  const input = document.querySelector(`.message[data-id="${id}"]`);
+  console.log('removeMessage: ', input);
+  input.remove();
 }
 
 function handleSubmit() {
@@ -172,7 +173,7 @@ const q = query(collection(db, 'messages'), orderBy('date', 'asc'));
 onSnapshot(q, (snapshot) => {
   snapshot.docChanges().forEach((change) => {
     if (change.type === 'added') {
-      console.log('added');
+      console.log('Added');
       if (!initialLoad) {
         displayMessage(change.doc.data());
       }
